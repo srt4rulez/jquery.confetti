@@ -8,13 +8,11 @@
     var particles         = [];
     var angle             = 0;
     var tiltAngle         = 0;
-    var confettiActive    = true;
+    var confettiActive    = false;
     var animationComplete = true;
     var deactivationTimerHandler;
     var reactivationTimerHandler;
     var animationHandler;
-
-    // objects
 
     var particleColors = {
         colorOptions:     ['DodgerBlue', 'OliveDrab', 'Gold', 'pink', 'SlateBlue', 'lightblue', 'Violet', 'PaleGreen', 'SteelBlue', 'SandyBrown', 'Chocolate', 'Crimson',],
@@ -34,6 +32,56 @@
             return this.colorOptions[this.colorIndex];
         }
     };
+
+    $(document).ready(function() {
+
+        SetGlobals();
+        InitializeButton();
+
+        $(window).resize(function() {
+            W = window.innerWidth;
+            H = window.innerHeight;
+            canvas.width = W;
+            canvas.height = H;
+        });
+
+    });
+
+    function SetGlobals() {
+
+        canvas = document.getElementById('canvas');
+        ctx = canvas.getContext('2d');
+        W = window.innerWidth;
+        H = window.innerHeight;
+        canvas.width = W;
+        canvas.height = H;
+
+    }
+
+    function InitializeButton() {
+        $('#stopButton').click(DeactivateConfetti);
+        $('#startButton').click(RestartConfetti);
+    }
+
+    function InitializeConfetti() {
+
+        var particleColor, index;
+
+        particles = [];
+
+        animationComplete = false;
+
+        for (index = 0; index < mp; index++) {
+
+            particleColor = particleColors.getColor();
+
+            particles.push(new confettiParticle(particleColor));
+
+        }
+
+        StartConfetti();
+
+    }
 
     function confettiParticle(color) {
 
@@ -58,66 +106,35 @@
 
     }
 
-    $(document).ready(function() {
-
-        SetGlobals();
-        InitializeButton();
-        InitializeConfetti();
-
-        $(window).resize(function() {
-            W = window.innerWidth;
-            H = window.innerHeight;
-            canvas.width = W;
-            canvas.height = H;
-        });
-
-    });
-
-    function InitializeButton() {
-        $('#stopButton').click(DeactivateConfetti);
-        $('#startButton').click(RestartConfetti);
-    }
-
     function StartConfetti() {
+
         W = window.innerWidth;
         H = window.innerHeight;
         canvas.width = W;
         canvas.height = H;
+
         (function animloop() {
+
             if (animationComplete) {
                 return null;
             }
-            animationHandler = requestAnimFrame(animloop);
+
+            animationHandler = window.requestAnimationFrame(animloop);
+
             Draw();
+
         }());
-    }
 
-    function SetGlobals() {
-        canvas = document.getElementById('canvas');
-        ctx = canvas.getContext('2d');
-        W = window.innerWidth;
-        H = window.innerHeight;
-        canvas.width = W;
-        canvas.height = H;
-    }
-
-    function InitializeConfetti() {
-        particles = [];
-        animationComplete = false;
-        for (var i = 0; i < mp; i++) {
-            var particleColor = particleColors.getColor();
-
-            particles.push(new confettiParticle(particleColor));
-        }
-        StartConfetti();
     }
 
     function Draw() {
 
+        var index;
+
         ctx.clearRect(0, 0, W, H);
 
-        for (var i = 0; i < mp; i++) {
-            particles[i].draw();
+        for (index = 0; index < mp; index++) {
+            particles[index].draw();
         }
 
         Update();
@@ -125,14 +142,17 @@
     }
 
     function Update() {
+
         var remainingFlakes = 0;
-        var particle;
+        var particle
+        var index;
 
         angle += 0.01;
         tiltAngle += 0.1;
 
-        for (var i = 0; i < mp; i++) {
-            particle = particles[i];
+        for (index = 0; index < mp; index++) {
+
+            particle = particles[index];
             if (animationComplete) {
                 return;
             }
@@ -142,44 +162,78 @@
                 continue;
             }
 
-            stepParticle(particle, i);
+            stepParticle(particle, index);
 
             if (particle.y <= H) {
                 remainingFlakes++;
             }
-            CheckForReposition(particle, i);
+
+            if (confettiActive) {
+                CheckForReposition(particle, index);
+            }
+
         }
 
         if (remainingFlakes === 0) {
             StopConfetti();
         }
-    }
 
-    function CheckForReposition(particle, index) {
-        if ((particle.x > W + 20 || particle.x < -20 || particle.y > H) && confettiActive) {
-            if (index % 5 > 0 || index % 2 == 0) { // 66.67% of the flakes
-                repositionParticle(particle, Math.random() * W, -10, Math.floor(Math.random() * 10) - 10);
-            } else if (Math.sin(angle) > 0) {
-                // Enter from the left
-                repositionParticle(particle, -5, Math.random() * H, Math.floor(Math.random() * 10) - 10);
-            } else {
-                // Enter from the right
-                repositionParticle(particle, W + 5, Math.random() * H, Math.floor(Math.random() * 10) - 10);
-            }
-        }
     }
 
     function stepParticle(particle, particleIndex) {
+
         particle.tiltAngle += particle.tiltAngleIncremental;
         particle.y += (Math.cos(angle + particle.d) + 3 + particle.r / 2) / 2;
         particle.x += Math.sin(angle);
         particle.tilt = (Math.sin(particle.tiltAngle - (particleIndex / 3))) * 15;
+
+    }
+
+    function CheckForReposition(particle, index) {
+
+        if ((particle.x > W + 20 || particle.x < -20 || particle.y > H)) {
+
+            if (index % 5 > 0 || index % 2 == 0) { // 66.67% of the flakes
+
+                repositionParticle(
+                    particle,
+                    Math.random() * W,
+                    -10,
+                    Math.floor(Math.random() * 10) - 10
+                );
+
+            } else if (Math.sin(angle) > 0) {
+
+                // Enter from the left
+                repositionParticle(
+                    particle,
+                    -5,
+                    Math.random() * H,
+                    Math.floor(Math.random() * 10) - 10
+                );
+
+            } else {
+
+                // Enter from the right
+                repositionParticle(
+                    particle,
+                    W + 5,
+                    Math.random() * H,
+                    Math.floor(Math.random() * 10) - 10
+                );
+
+            }
+
+        }
+
     }
 
     function repositionParticle(particle, xCoordinate, yCoordinate, tilt) {
+
         particle.x = xCoordinate;
         particle.y = yCoordinate;
         particle.tilt = tilt;
+
     }
 
     function ClearTimers() {
@@ -201,8 +255,10 @@
     }
 
     function RestartConfetti() {
+
         ClearTimers();
         StopConfetti();
+
         reactivationTimerHandler = setTimeout(function() {
             confettiActive = true;
             animationComplete = false;
@@ -211,9 +267,4 @@
 
     }
 
-    window.requestAnimFrame = (function() {
-        return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function(callback) {
-            return window.setTimeout(callback, 1000 / 60);
-        };
-    }());
 }());
