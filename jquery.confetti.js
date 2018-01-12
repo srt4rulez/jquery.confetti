@@ -1,4 +1,4 @@
-(function () {
+(function() {
     // globals
     var canvas;
     var ctx;
@@ -17,11 +17,11 @@
     // objects
 
     var particleColors = {
-        colorOptions: ["DodgerBlue", "OliveDrab", "Gold", "pink", "SlateBlue", "lightblue", "Violet", "PaleGreen", "SteelBlue", "SandyBrown", "Chocolate", "Crimson"],
-        colorIndex: 0,
+        colorOptions:     ['DodgerBlue', 'OliveDrab', 'Gold', 'pink', 'SlateBlue', 'lightblue', 'Violet', 'PaleGreen', 'SteelBlue', 'SandyBrown', 'Chocolate', 'Crimson',],
+        colorIndex:       0,
         colorIncrementer: 0,
-        colorThreshold: 10,
-        getColor: function () {
+        colorThreshold:   10,
+        getColor:         function() {
             if (this.colorIncrementer >= 10) {
                 this.colorIncrementer = 0;
                 this.colorIndex++;
@@ -30,39 +30,41 @@
                 }
             }
             this.colorIncrementer++;
+
             return this.colorOptions[this.colorIndex];
         }
-    }
+    };
 
     function confettiParticle(color) {
 
-        this.x                    = Math.random() * W; // x-coordinate
-        this.y                    = (Math.random() * H) - H; //y-coordinate
-        this.r                    = Math.floor(Math.random() * (10 - 30 + 1) + 30); //radius;
-        this.d                    = (Math.random() * mp) + 10; //density;
-        this.color                = color;
-        this.tilt                 = Math.floor(Math.random() * 10) - 10;
+        this.x = Math.random() * W; // x-coordinate
+        this.y = (Math.random() * H) - H; // y-coordinate
+        this.r = Math.floor(Math.random() * (10 - 30 + 1) + 30); // radius;
+        this.d = (Math.random() * mp) + 10; // density;
+        this.color = color;
+        this.tilt = Math.floor(Math.random() * 10) - 10;
         this.tiltAngleIncremental = (Math.random() * 0.07) + .05;
-        this.tiltAngle            = 0;
+        this.tiltAngle = 0;
 
-        this.draw = function () {
+        this.draw = function() {
             ctx.beginPath();
-            ctx.lineWidth   = this.r / 2;
+            ctx.lineWidth = this.r / 2;
             ctx.strokeStyle = this.color;
             ctx.moveTo(this.x + this.tilt + (this.r / 4), this.y);
             ctx.lineTo(this.x + this.tilt, this.y + this.tilt + (this.r / 4));
+
             return ctx.stroke();
-        }
+        };
 
     }
 
-    $(document).ready(function () {
+    $(document).ready(function() {
 
         SetGlobals();
         InitializeButton();
         InitializeConfetti();
 
-        $(window).resize(function () {
+        $(window).resize(function() {
             W = window.innerWidth;
             H = window.innerHeight;
             canvas.width = W;
@@ -82,15 +84,17 @@
         canvas.width = W;
         canvas.height = H;
         (function animloop() {
-            if (animationComplete) return null;
+            if (animationComplete) {
+                return null;
+            }
             animationHandler = requestAnimFrame(animloop);
             Draw();
-        })();
+        }());
     }
 
     function SetGlobals() {
-        canvas = document.getElementById("canvas");
-        ctx = canvas.getContext("2d");
+        canvas = document.getElementById('canvas');
+        ctx = canvas.getContext('2d');
         W = window.innerWidth;
         H = window.innerHeight;
         canvas.width = W;
@@ -102,6 +106,7 @@
         animationComplete = false;
         for (var i = 0; i < mp; i++) {
             var particleColor = particleColors.getColor();
+
             particles.push(new confettiParticle(particleColor));
         }
         StartConfetti();
@@ -122,12 +127,15 @@
     function Update() {
         var remainingFlakes = 0;
         var particle;
+
         angle += 0.01;
         tiltAngle += 0.1;
 
         for (var i = 0; i < mp; i++) {
             particle = particles[i];
-            if (animationComplete) return;
+            if (animationComplete) {
+                return;
+            }
 
             if (!confettiActive && particle.y < -15) {
                 particle.y = H + 100;
@@ -151,14 +159,12 @@
         if ((particle.x > W + 20 || particle.x < -20 || particle.y > H) && confettiActive) {
             if (index % 5 > 0 || index % 2 == 0) { // 66.67% of the flakes
                 repositionParticle(particle, Math.random() * W, -10, Math.floor(Math.random() * 10) - 10);
+            } else if (Math.sin(angle) > 0) {
+                // Enter from the left
+                repositionParticle(particle, -5, Math.random() * H, Math.floor(Math.random() * 10) - 10);
             } else {
-                if (Math.sin(angle) > 0) {
-                    //Enter from the left
-                    repositionParticle(particle, -5, Math.random() * H, Math.floor(Math.random() * 10) - 10);
-                } else {
-                    //Enter from the right
-                    repositionParticle(particle, W + 5, Math.random() * H, Math.floor(Math.random() * 10) - 10);
-                }
+                // Enter from the right
+                repositionParticle(particle, W + 5, Math.random() * H, Math.floor(Math.random() * 10) - 10);
             }
         }
     }
@@ -188,14 +194,16 @@
 
     function StopConfetti() {
         animationComplete = true;
-        if (ctx == undefined) return;
+        if (ctx == undefined) {
+            return;
+        }
         ctx.clearRect(0, 0, W, H);
     }
 
     function RestartConfetti() {
         ClearTimers();
         StopConfetti();
-        reactivationTimerHandler = setTimeout(function () {
+        reactivationTimerHandler = setTimeout(function() {
             confettiActive = true;
             animationComplete = false;
             InitializeConfetti();
@@ -203,9 +211,9 @@
 
     }
 
-    window.requestAnimFrame = (function () {
-        return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (callback) {
+    window.requestAnimFrame = (function() {
+        return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function(callback) {
             return window.setTimeout(callback, 1000 / 60);
         };
-    })();
-})();
+    }());
+}());
