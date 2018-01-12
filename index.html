@@ -2,61 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Document</title>
+    <title>jquery.confetti 🎉😄</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.3/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-        }
 
         body {
-            /*You can use any kind of background here.*/
-            background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
 
         canvas {
-            display: block;
-            position: relative;
-            zindex: 1;
+            position: absolute;
             pointer-events: none;
         }
 
-        #content {
-            text-align: center;
-            width: 500px;
-            height: 300px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            margin-left: -250px;
-            margin-top: -150px;
-            color: silver;
-            font-family: verdana;
-            font-size: 45px;
-            font-weight: bold;
-        }
-
-        .buttonContainer {
-            display: inline-block;
-        }
-
-        button {
-            padding: 5px 10px;
-            font-size: 20px;
-        }
     </style>
+
 </head>
 <body>
-    <div id="content">
-        Hello World
-        <br /> I love confetti!
-        <br />
-        <div class="buttonContainer">
-            <button id="stopButton">Stop Confetti</button>
-            <button id="startButton">Drop Confetti</button>
-        </div>
+
+    <div class="container text-center">
+
+        <h1 class="display-2">jquery.confetti 🎉</h1>
+
+        <hr class="my-4">
+
+        <button id="stopButton" class="btn btn-primary btn-lg">😞 Stop the fun</button>
+        <button id="startButton" class="btn btn-primary btn-lg">🎉 Drop Confetti</button>
+
     </div>
+
     <canvas id="canvas"></canvas>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="jquery.confetti.js"></script>
 </body>
