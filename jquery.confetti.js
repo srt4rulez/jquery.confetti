@@ -4,11 +4,11 @@
     var ctx;
     var W;
     var H;
-    var mp = 150; //max particles
-    var particles = [];
-    var angle = 0;
-    var tiltAngle = 0;
-    var confettiActive = true;
+    var mp                = 150; // max particles
+    var particles         = [];
+    var angle             = 0;
+    var tiltAngle         = 0;
+    var confettiActive    = true;
     var animationComplete = true;
     var deactivationTimerHandler;
     var reactivationTimerHandler;
@@ -35,26 +35,29 @@
     }
 
     function confettiParticle(color) {
-        this.x = Math.random() * W; // x-coordinate
-        this.y = (Math.random() * H) - H; //y-coordinate
-        this.r = RandomFromTo(10, 30); //radius;
-        this.d = (Math.random() * mp) + 10; //density;
-        this.color = color;
-        this.tilt = Math.floor(Math.random() * 10) - 10;
+
+        this.x                    = Math.random() * W; // x-coordinate
+        this.y                    = (Math.random() * H) - H; //y-coordinate
+        this.r                    = Math.floor(Math.random() * (10 - 30 + 1) + 30); //radius;
+        this.d                    = (Math.random() * mp) + 10; //density;
+        this.color                = color;
+        this.tilt                 = Math.floor(Math.random() * 10) - 10;
         this.tiltAngleIncremental = (Math.random() * 0.07) + .05;
-        this.tiltAngle = 0;
+        this.tiltAngle            = 0;
 
         this.draw = function () {
             ctx.beginPath();
-            ctx.lineWidth = this.r / 2;
+            ctx.lineWidth   = this.r / 2;
             ctx.strokeStyle = this.color;
             ctx.moveTo(this.x + this.tilt + (this.r / 4), this.y);
             ctx.lineTo(this.x + this.tilt, this.y + this.tilt + (this.r / 4));
             return ctx.stroke();
         }
+
     }
 
     $(document).ready(function () {
+
         SetGlobals();
         InitializeButton();
         InitializeConfetti();
@@ -71,6 +74,18 @@
     function InitializeButton() {
         $('#stopButton').click(DeactivateConfetti);
         $('#startButton').click(RestartConfetti);
+    }
+
+    function StartConfetti() {
+        W = window.innerWidth;
+        H = window.innerHeight;
+        canvas.width = W;
+        canvas.height = H;
+        (function animloop() {
+            if (animationComplete) return null;
+            animationHandler = requestAnimFrame(animloop);
+            Draw();
+        })();
     }
 
     function SetGlobals() {
@@ -93,22 +108,16 @@
     }
 
     function Draw() {
+
         ctx.clearRect(0, 0, W, H);
-        var results = [];
+
         for (var i = 0; i < mp; i++) {
-            (function (j) {
-                results.push(particles[j].draw());
-            })(i);
+            particles[i].draw();
         }
+
         Update();
 
-        return results;
     }
-
-    function RandomFromTo(from, to) {
-        return Math.floor(Math.random() * (to - from + 1) + from);
-    }
-
 
     function Update() {
         var remainingFlakes = 0;
@@ -140,8 +149,7 @@
 
     function CheckForReposition(particle, index) {
         if ((particle.x > W + 20 || particle.x < -20 || particle.y > H) && confettiActive) {
-            if (index % 5 > 0 || index % 2 == 0) //66.67% of the flakes
-            {
+            if (index % 5 > 0 || index % 2 == 0) { // 66.67% of the flakes
                 repositionParticle(particle, Math.random() * W, -10, Math.floor(Math.random() * 10) - 10);
             } else {
                 if (Math.sin(angle) > 0) {
@@ -154,6 +162,7 @@
             }
         }
     }
+
     function stepParticle(particle, particleIndex) {
         particle.tiltAngle += particle.tiltAngleIncremental;
         particle.y += (Math.cos(angle + particle.d) + 3 + particle.r / 2) / 2;
@@ -165,18 +174,6 @@
         particle.x = xCoordinate;
         particle.y = yCoordinate;
         particle.tilt = tilt;
-    }
-
-    function StartConfetti() {
-        W = window.innerWidth;
-        H = window.innerHeight;
-        canvas.width = W;
-        canvas.height = H;
-        (function animloop() {
-            if (animationComplete) return null;
-            animationHandler = requestAnimFrame(animloop);
-            return Draw();
-        })();
     }
 
     function ClearTimers() {
